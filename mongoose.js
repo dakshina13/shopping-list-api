@@ -13,9 +13,10 @@ mongoose
     console.log("Connection failed!");
   });
 
-  
 const addItem = async (req, res, next) => {
-  if (req.name == null || req.quantity == null) {
+  if (req.body.name == null || req.body.quantity == null) {
+    console.log("name " + req.body.name);
+    console.log("quantity " + req.body.quantity);
     return res.status(440).json({ message: "Name and quantity is required!" });
   }
   const item = new Item({
@@ -26,14 +27,25 @@ const addItem = async (req, res, next) => {
   res.json(result);
 };
 
-
 const getItems = async (req, res, next) => {
   const items = await Item.find().exec();
   res.json(items);
 };
+const getSingleItem = async (req, res, next) => {
+  if (req.body.id == null) {
+    return res.status(440).json({ message: "Id is required!" });
+  }
+  const item = await Item.findOne({ _id: req.body.id });
+  if (item) {
+    return res.json(item);
+  }
+  res.status(400).json({
+    message: "Invalid id.",
+  });
+};
 
 const updateItem = async (req, res, next) => {
-  if (req.name == null || req.quantity == null || req.id == null) {
+  if (req.body.name == null || req.body.quantity == null || req.body.id == null) {
     return res
       .status(440)
       .json({ message: "Name, quantity and id is required!" });
@@ -53,9 +65,8 @@ const updateItem = async (req, res, next) => {
   });
 };
 
-
 const deleteItem = async (req, res, next) => {
-  if (req.id == null) {
+  if (req.body.id == null) {
     return res.status(440).json({ message: "Id is required!" });
   }
   const item = await Item.findOne({ _id: req.body.id });
@@ -72,3 +83,4 @@ exports.additem = addItem;
 exports.getItems = getItems;
 exports.updateItem = updateItem;
 exports.deleteItem = deleteItem;
+exports.getSingleItem = getSingleItem;

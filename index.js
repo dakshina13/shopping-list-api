@@ -21,6 +21,8 @@ app.use((req, res, next) => {
 
 app.get("/shopping", routes.getItems);
 
+app.get("/item", routes.getSingleItem);
+
 app.post("/add-item", routes.additem);
 
 app.put("/edit-item", routes.updateItem);
