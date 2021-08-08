@@ -6,7 +6,8 @@ const Category = require("./models/category");
 
 mongoose
   .connect(
-    "mongodb+srv://dak:abcd1234@cluster0.z70im.mongodb.net/test?retryWrites=true&w=majority"
+    "mongodb+srv://dak:abcd1234@cluster0.z70im.mongodb.net/test?retryWrites=true&w=majority",
+    { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(() => {
     console.log("Connected to database!");
@@ -35,10 +36,9 @@ const addItem = async (req, res, next) => {
     categoryId = category._id;
     const resultCategory = await category.save();
     //console.log(resultCategory);
-  } 
+  }
   //checking category if it exists by the id in the database
-  else 
-  {
+  else {
     const category = await Category.findOne({
       _id: categoryId,
     }).exec();
@@ -77,7 +77,7 @@ const getSingleItem = async (req, res, next) => {
     return res.status(440).json({ message: "Id is required!" });
   }
   const itemMongoose = await Item.findOne({ _id: req.body.id });
-  const item = itemMongoose.toObject();
+  const item = itemMongoose;
   if (item) {
     //Very important item stores alot of data returned by mongoose
     //let i=item.toObject();
@@ -92,9 +92,10 @@ const getSingleItem = async (req, res, next) => {
     // }
 
     //finding the category name and appending it to object
+    let i = item.toObject();
     const category = await Category.findOne({ _id: item.category });
-    item.categoryName = category.name;
-    return res.json(item);
+    i.categoryName = category.name;
+    return res.json(i);
   }
   res.status(400).json({
     message: "Invalid id.",
@@ -123,10 +124,9 @@ const updateItem = async (req, res, next) => {
     categoryId = category._id;
     const resultCategory = await category.save();
     //console.log(resultCategory);
-  } 
-  else 
+  }
   //checking category if it exists by the id in the database
-  {
+  else {
     const category = await Category.findOne({
       _id: categoryId,
     }).exec();
@@ -166,8 +166,15 @@ const deleteItem = async (req, res, next) => {
   });
 };
 
+//get all categories
+const getCategories = async (req, res, next) => {
+  const cat = await Category.find().exec();
+  res.json(cat);
+};
+
 exports.additem = addItem;
 exports.getItems = getItems;
 exports.updateItem = updateItem;
 exports.deleteItem = deleteItem;
 exports.getSingleItem = getSingleItem;
+exports.getCategories = getCategories;

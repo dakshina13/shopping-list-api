@@ -28,4 +28,7 @@ app.post("/add-item", routes.additem);
 app.put("/edit-item", routes.updateItem);
 
 app.delete("/delete-item", routes.deleteItem);
+
+app.get("/categories", routes.getCategories);
+
 app.listen(5000);
