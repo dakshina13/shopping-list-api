@@ -1,3 +1,4 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
 
 const Item = require("./models/item");
@@ -6,7 +7,7 @@ const Category = require("./models/category");
 
 mongoose
   .connect(
-    "mongodb+srv://dak:abcd1234@cluster0.z70im.mongodb.net/test?retryWrites=true&w=majority",
+    process.env.MONGO_URL,
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(() => {
