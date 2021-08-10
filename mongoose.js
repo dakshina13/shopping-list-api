@@ -22,7 +22,9 @@ mongoose
 const addItem = async (req, res, next) => {
   //General validation
   try {
+    // console.log("Add item 1");
     const valid = await itemSchema.validateAsync(req.body);
+    // console.log("Add item 2");
     //Checking if category is a new category or old category
     let categoryId = valid.category;
     //new category aadding to database
@@ -42,6 +44,7 @@ const addItem = async (req, res, next) => {
         return res.status(440).json({ message: "Category Id found!" });
       }
     }
+    // console.log("Add item 3");
     //creating item and saving to db
     const item = new Item({
       name: valid.name,
@@ -49,11 +52,13 @@ const addItem = async (req, res, next) => {
       category: categoryId,
     });
     const result = await item.save();
+    // console.log("Add item 4");
     res.json(result);
   } catch (error) {
     if (error.isJoi) {
       const msg = error["details"][0].message;
       const obj = { message: msg };
+      // console.log(msg);
       res.status(422).json(obj);
     }
   }
@@ -139,7 +144,7 @@ const updateItem = async (req, res, next) => {
         quantity: valid.quantity,
         category: categoryId,
       });
-      console.log(updateResult);
+      // console.log(updateResult);
       const updatedItem = await Item.findOne({ _id: valid.id });
       //console.log(item);
       return res.json(updatedItem);
