@@ -5,11 +5,13 @@ const Item = require("./models/item");
 
 const Category = require("./models/category");
 
+const { itemSchema } = require("./validation/validate");
+
 mongoose
-  .connect(
-    process.env.MONGO_URL,
-    { useNewUrlParser: true, useUnifiedTopology: true }
-  )
+  .connect(process.env.MONGO_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
     console.log("Connected to database!");
   })
@@ -19,42 +21,42 @@ mongoose
 
 const addItem = async (req, res, next) => {
   //General validation
-  if (
-    req.body.name == null ||
-    req.body.quantity == null ||
-    req.body.category == null
-  ) {
-    return res
-      .status(440)
-      .json({ message: "Name ,quantity and category is required!" });
-  }
-  //Checking if category is a new category or old category
-  let categoryId = req.body.category;
-  //new category aadding to database
-  if (categoryId === "others") {
-    //console.log(req.body.categoryName);
-    const category = new Category({ name: req.body.categoryName });
-    categoryId = category._id;
-    const resultCategory = await category.save();
-    //console.log(resultCategory);
-  }
-  //checking category if it exists by the id in the database
-  else {
-    const category = await Category.findOne({
-      _id: categoryId,
-    }).exec();
-    if (!category) {
-      return res.status(440).json({ message: "Category Id found!" });
+  try {
+    const valid = await itemSchema.validateAsync(req.body);
+    //Checking if category is a new category or old category
+    let categoryId = valid.category;
+    //new category aadding to database
+    if (categoryId === "others") {
+      //console.log(req.body.categoryName);
+      const category = new Category({ name: valid.categoryName });
+      categoryId = category._id;
+      const resultCategory = await category.save();
+      //console.log(resultCategory);
+    }
+    //checking category if it exists by the id in the database
+    else {
+      const category = await Category.findOne({
+        _id: categoryId,
+      }).exec();
+      if (!category) {
+        return res.status(440).json({ message: "Category Id found!" });
+      }
+    }
+    //creating item and saving to db
+    const item = new Item({
+      name: valid.name,
+      quantity: valid.quantity,
+      category: categoryId,
+    });
+    const result = await item.save();
+    res.json(result);
+  } catch (error) {
+    if (error.isJoi) {
+      const msg = error["details"][0].message;
+      const obj = { message: msg };
+      res.status(422).json(obj);
     }
   }
-  //creating item and saving to db
-  const item = new Item({
-    name: req.body.name,
-    quantity: req.body.quantity,
-    category: categoryId,
-  });
-  const result = await item.save();
-  res.json(result);
 };
 
 const getItems = async (req, res, next) => {
@@ -75,7 +77,7 @@ const getItems = async (req, res, next) => {
 const getSingleItem = async (req, res, next) => {
   //General validation
   if (req.body.id == null) {
-    return res.status(440).json({ message: "Id is required!" });
+    return res.status(422).json({ message: "Id is required!" });
   }
   const itemMongoose = await Item.findOne({ _id: req.body.id });
   const item = itemMongoose;
@@ -105,51 +107,54 @@ const getSingleItem = async (req, res, next) => {
 
 const updateItem = async (req, res, next) => {
   //General validation
-  if (
-    req.body.name == null ||
-    req.body.quantity == null ||
-    req.body.id == null ||
-    req.body.category == null
-  ) {
-    return res
-      .status(440)
-      .json({ message: "Name, quantity and id is required!" });
-  }
-  const item = await Item.findOne({ _id: req.body.id });
-  //Checking if category is a new category or old category
-  let categoryId = req.body.category;
-  //new category aadding to database
-  if (categoryId === "others") {
-    //console.log(req.body.categoryName);
-    const category = new Category({ name: req.body.categoryName });
-    categoryId = category._id;
-    const resultCategory = await category.save();
-    //console.log(resultCategory);
-  }
-  //checking category if it exists by the id in the database
-  else {
-    const category = await Category.findOne({
-      _id: categoryId,
-    }).exec();
-    if (!category) {
-      return res.status(440).json({ message: "Category Id found!" });
+  try {
+    const valid = await itemSchema.validateAsync(req.body);
+    const item = await Item.findOne({ _id: valid.id });
+    if (!item) {
+      throw new Error("Invalid Id");
     }
-  }
-  //if item exists by item item will not be null
-  if (item) {
-    await item.updateOne({
-      name: req.body.name,
-      quantity: req.body.quantity,
-      category: categoryId,
+    //Checking if category is a new category or old category
+    let categoryId = valid.category;
+    //new category aadding to database
+    if (categoryId === "others") {
+      //console.log(req.body.categoryName);
+      const category = new Category({ name: valid.categoryName });
+      categoryId = category._id;
+      const resultCategory = await category.save();
+      //console.log(resultCategory);
+    }
+    //checking category if it exists by the id in the database
+    else {
+      const category = await Category.findOne({
+        _id: categoryId,
+      }).exec();
+      if (!category) {
+        return res.status(440).json({ message: "Category Id found!" });
+      }
+    }
+    //if item exists by item item will not be null
+    if (item) {
+      const updateResult = await item.updateOne({
+        name: valid.name,
+        quantity: valid.quantity,
+        category: categoryId,
+      });
+      console.log(updateResult);
+      const updatedItem = await Item.findOne({ _id: valid.id });
+      //console.log(item);
+      return res.json(updatedItem);
+    }
+  } catch (error) {
+    if (error.isJoi) {
+      const msg = error["details"][0].message;
+      const obj = { message: msg };
+      return res.status(422).json(obj);
+    }
+    //If id is not in the database
+    res.status(400).json({
+      message: error.message,
     });
-    const updatedItem = await Item.findOne({ _id: req.body.id });
-    //console.log(item);
-    return res.json(updatedItem);
   }
-  //If id is not in the database
-  res.status(400).json({
-    message: "Invalid id.",
-  });
 };
 
 const deleteItem = async (req, res, next) => {
