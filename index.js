@@ -33,7 +33,7 @@ app.post("/add-item", authenicateToken, routes.addItem);
 
 app.put("/edit-item", authenicateToken, routes.updateItem);
 
-app.delete("/delete-item", routes.deleteItem);
+app.delete("/delete-item", authenicateToken, routes.deleteItem);
 
 app.get("/categories", routes.getCategories);
 

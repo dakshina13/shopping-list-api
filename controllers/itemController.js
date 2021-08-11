@@ -165,11 +165,12 @@ const updateItem = async (req, res, next) => {
 };
 
 const deleteItem = async (req, res, next) => {
+  const user = req.user;
   //General validation
   if (req.body.id == null) {
     return res.status(440).json({ message: "Id is required!" });
   }
-  const item = await Item.findOne({ _id: req.body.id });
+  const item = await Item.findOne({ _id: req.body.id, userId: user._id });
   if (item) {
     await item.deleteOne();
     return res.json(item);
