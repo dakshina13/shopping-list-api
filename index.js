@@ -31,4 +31,6 @@ app.delete("/delete-item", routes.deleteItem);
 
 app.get("/categories", routes.getCategories);
 
+app.post("/register", routes.addUser);
+
 app.listen(5000);

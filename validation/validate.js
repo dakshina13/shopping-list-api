@@ -5,9 +5,14 @@ const itemSchema = Joi.object({
   quantity: Joi.number().min(1).required(),
   category: Joi.string().alphanum().required(),
   id: Joi.string().alphanum(),
-  categoryName: Joi.string().allow(''),
+  categoryName: Joi.string().allow(""),
 });
 
-//const categorySchema=Joi.object({})
+const userSchema = Joi.object({
+  name: Joi.string().required(),
+  password: Joi.string().min(6).required(),
+  email: Joi.string().email().required(),
+});
 
 exports.itemSchema = itemSchema;
+exports.userSchema = userSchema;
