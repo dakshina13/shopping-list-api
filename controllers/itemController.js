@@ -3,14 +3,13 @@ const Item = require("../models/item");
 const Category = require("../models/category");
 
 const { itemSchema } = require("../validation/validate");
-const user = require("../models/user");
 
 const addItem = async (req, res, next) => {
   try {
-    console.log(req.user);
+    // console.log(req.user);
     const user = req.user;
     // console.log("Add item 1");
-    console.log(req.body);
+    // console.log(req.body);
     //General validation
     const valid = await itemSchema.validateAsync(req.body);
     // console.log("Add item 2");
@@ -56,7 +55,7 @@ const addItem = async (req, res, next) => {
 
 const getItems = async (req, res, next) => {
   // console.log(req);
-  console.log(req.user);
+  // console.log(req.user);
   const user = req.user;
   const items = await Item.find({ userId: user._id }).exec();
   const category = await Category.find().exec();
@@ -74,10 +73,15 @@ const getItems = async (req, res, next) => {
 
 const getSingleItem = async (req, res, next) => {
   //General validation
+  // const user = req.user;
+  console.log(user);
   if (req.body.id == null) {
     return res.status(422).json({ message: "Id is required!" });
   }
-  const itemMongoose = await Item.findOne({ _id: req.body.id });
+  const itemMongoose = await Item.findOne({
+    _id: req.body.id,
+    userId: user._id,
+  });
   const item = itemMongoose;
   if (item) {
     //Very important item stores alot of data returned by mongoose

@@ -27,10 +27,9 @@ app.use((req, res, next) => {
 
 app.get("/shopping", authenicateToken, routes.getItems);
 
+app.post("/item", authenicateToken, routes.getSingleItem);
 
-app.post("/item", routes.getSingleItem);
-
-app.post("/add-item",authenicateToken, routes.addItem);
+app.post("/add-item", authenicateToken, routes.addItem);
 
 app.put("/edit-item", routes.updateItem);
 
