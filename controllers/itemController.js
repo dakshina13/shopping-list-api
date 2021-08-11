@@ -110,8 +110,9 @@ const getSingleItem = async (req, res, next) => {
 const updateItem = async (req, res, next) => {
   //General validation
   try {
+    const user = req.user;
     const valid = await itemSchema.validateAsync(req.body);
-    const item = await Item.findOne({ _id: valid.id });
+    const item = await Item.findOne({ _id: valid.id, userId: user._id });
     if (!item) {
       throw new Error("Invalid Id");
     }
@@ -140,9 +141,13 @@ const updateItem = async (req, res, next) => {
         name: valid.name,
         quantity: valid.quantity,
         category: categoryId,
+        userId: user._id,
       });
       // console.log(updateResult);
-      const updatedItem = await Item.findOne({ _id: valid.id });
+      const updatedItem = await Item.findOne({
+        _id: valid.id,
+        userId: user._id,
+      });
       //console.log(item);
       return res.json(updatedItem);
     }

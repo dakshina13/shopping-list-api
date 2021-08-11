@@ -31,7 +31,7 @@ app.post("/item", authenicateToken, routes.getSingleItem);
 
 app.post("/add-item", authenicateToken, routes.addItem);
 
-app.put("/edit-item", routes.updateItem);
+app.put("/edit-item", authenicateToken, routes.updateItem);
 
 app.delete("/delete-item", routes.deleteItem);
 
