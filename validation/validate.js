@@ -21,4 +21,3 @@ const authSchema = Joi.object({
 exports.itemSchema = itemSchema;
 exports.userSchema = userSchema;
 exports.authSchema = authSchema;
-

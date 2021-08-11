@@ -3,11 +3,15 @@ const Item = require("../models/item");
 const Category = require("../models/category");
 
 const { itemSchema } = require("../validation/validate");
+const user = require("../models/user");
 
 const addItem = async (req, res, next) => {
-  //General validation
   try {
+    console.log(req.user);
+    const user = req.user;
     // console.log("Add item 1");
+    console.log(req.body);
+    //General validation
     const valid = await itemSchema.validateAsync(req.body);
     // console.log("Add item 2");
     //Checking if category is a new category or old category
@@ -35,6 +39,7 @@ const addItem = async (req, res, next) => {
       name: valid.name,
       quantity: valid.quantity,
       category: categoryId,
+      userId: user._id,
     });
     const result = await item.save();
     // console.log("Add item 4");
@@ -50,7 +55,10 @@ const addItem = async (req, res, next) => {
 };
 
 const getItems = async (req, res, next) => {
-  const items = await Item.find().exec();
+  // console.log(req);
+  console.log(req.user);
+  const user = req.user;
+  const items = await Item.find({ userId: user._id }).exec();
   const category = await Category.find().exec();
   let itemsCategory = [];
   //adding the category name to each list item
