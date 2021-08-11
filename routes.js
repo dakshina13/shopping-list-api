@@ -1,4 +1,5 @@
 require("dotenv").config();
+
 const mongoose = require("mongoose");
 
 const ItemController = require("./controllers/itemController");
@@ -26,3 +27,4 @@ exports.deleteItem = ItemController.deleteItem;
 exports.getSingleItem = ItemController.getSingleItem;
 exports.getCategories = ItemController.getCategories;
 exports.addUser = UserController.addUser;
+exports.loginUser=UserController.loginUser;

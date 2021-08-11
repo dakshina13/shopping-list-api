@@ -1,34 +1,86 @@
-const bcript = require("bcrypt");
+const bcrypt = require("bcrypt");
+
+require("dotenv").config();
+
+const jwt = require("jsonwebtoken");
+
 const User = require("../models/user");
 
-const { userSchema } = require("../validation/validate");
+const { userSchema, authSchema } = require("../validation/validate");
 
 const addUser = async (req, res) => {
   try {
     const valid = await userSchema.validateAsync(req.body);
-    const registered = await User.findOne({ email: req.body.email });
+    const registered = await User.findOne({ email: valid.email });
     if (registered) {
       throw new Error("User already exists");
     }
-    const hashedPassword = await bcript.hash(valid.password, 10);
+    const hashedPassword = await bcrypt.hash(valid.password, 10);
     const user = new User({
       name: valid.name,
       email: valid.email,
       password: hashedPassword,
     });
-    let  returnObj={};
     const result = await user.save();
-    returnObj.email=result.email;
-    returnObj._id=result._id;
-    res.json(returnObj);
+    let userObj = createUser(result);
+    const token = generateToken(userObj);
+    res.json(token);
   } catch (error) {
     if (error.isJoi) {
       const msg = error["details"][0].message;
       const obj = { message: msg };
       return res.status(422).json(obj);
     }
-    res.status(400).json({massage:error.message});
+    res.status(400).json({ message: error.message });
   }
 };
 
+const loginUser = async (req, res) => {
+  try {
+    const valid = await authSchema.validateAsync(req.body);
+    const registered = await User.findOne({ email: valid.email });
+    if (registered) {
+      if (await bcrypt.compare(valid.password, registered.password)) {
+        const user = createUser(registered);
+        return res.json({ token: generateToken(user) });
+      } else {
+        return res
+          .sendStatus(403)
+          .json({ message: "Invalid username and password" });
+      }
+    } else {
+      return res
+        .sendStatus(403)
+        .json({ message: "Invalid username and password" });
+    }
+  } catch (error) {
+    if (error.isJoi) {
+      const msg = error["details"][0].message;
+      const obj = { message: msg };
+      return res.status(422).json(obj);
+    }
+    console.log(error);
+    res.status(400).json({ message: error.message });
+  }
+};
+function createUser(fullUser) {
+  let user = {
+    name: fullUser.name,
+    email: fullUser.email,
+    _id: fullUser._id,
+  };
+  return user;
+}
+
+function generateToken(user) {
+  let obj = {};
+  obj.token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "1d",
+  });
+  let date = new Date();
+  date.setDate(date.getDate() + 1);
+  obj.expiresIn = date.getTime();
+  return obj;
+}
 exports.addUser = addUser;
+exports.loginUser = loginUser;

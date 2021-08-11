@@ -13,6 +13,12 @@ const userSchema = Joi.object({
   password: Joi.string().min(6).required(),
   email: Joi.string().email().required(),
 });
+const authSchema = Joi.object({
+  password: Joi.string().min(6).required(),
+  email: Joi.string().email().required(),
+});
 
 exports.itemSchema = itemSchema;
 exports.userSchema = userSchema;
+exports.authSchema = authSchema;
+

@@ -33,4 +33,6 @@ app.get("/categories", routes.getCategories);
 
 app.post("/register", routes.addUser);
 
+app.post("/login", routes.loginUser);
+
 app.listen(5000);
