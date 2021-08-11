@@ -1,23 +1,8 @@
-require("dotenv").config();
-const mongoose = require("mongoose");
+const Item = require("../models/item");
 
-const Item = require("./models/item");
+const Category = require("../models/category");
 
-const Category = require("./models/category");
-
-const { itemSchema } = require("./validation/validate");
-
-mongoose
-  .connect(process.env.MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log("Connected to database!");
-  })
-  .catch(() => {
-    console.log("Connection failed!");
-  });
+const { itemSchema } = require("../validation/validate");
 
 const addItem = async (req, res, next) => {
   //General validation
@@ -183,7 +168,7 @@ const getCategories = async (req, res, next) => {
   res.json(cat);
 };
 
-exports.additem = addItem;
+exports.addItem = addItem;
 exports.getItems = getItems;
 exports.updateItem = updateItem;
 exports.deleteItem = deleteItem;

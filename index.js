@@ -2,7 +2,7 @@ const express = require("express");
 
 const app = express();
 
-const routes = require("./mongoose");
+const routes = require("./routes");
 
 app.use(express.json());
 
@@ -23,7 +23,7 @@ app.get("/shopping", routes.getItems);
 
 app.post("/item", routes.getSingleItem);
 
-app.post("/add-item", routes.additem);
+app.post("/add-item", routes.addItem);
 
 app.put("/edit-item", routes.updateItem);
 
