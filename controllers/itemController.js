@@ -73,8 +73,8 @@ const getItems = async (req, res, next) => {
 
 const getSingleItem = async (req, res, next) => {
   //General validation
-  // const user = req.user;
-  console.log(user);
+  const user = req.user;
+  // console.log(user);
   if (req.body.id == null) {
     return res.status(422).json({ message: "Id is required!" });
   }
@@ -167,8 +167,9 @@ const updateItem = async (req, res, next) => {
 const deleteItem = async (req, res, next) => {
   const user = req.user;
   //General validation
+  // console.log(req.body);
   if (req.body.id == null) {
-    return res.status(440).json({ message: "Id is required!" });
+    return res.status(400).json({ message: "Id is required!" });
   }
   const item = await Item.findOne({ _id: req.body.id, userId: user._id });
   if (item) {

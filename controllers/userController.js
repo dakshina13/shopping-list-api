@@ -10,6 +10,7 @@ const { userSchema, authSchema } = require("../validation/validate");
 
 const addUser = async (req, res) => {
   try {
+    // console.log(req.headers);
     const valid = await userSchema.validateAsync(req.body);
     const registered = await User.findOne({ email: valid.email });
     if (registered) {
@@ -37,6 +38,7 @@ const addUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   try {
+    // console.log(req.headers);
     const valid = await authSchema.validateAsync(req.body);
     const registered = await User.findOne({ email: valid.email });
     if (registered) {
