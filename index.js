@@ -8,6 +8,8 @@ const jwt = require("jsonwebtoken");
 
 const routes = require("./routes");
 
+const agenda = require("./controllers/weatherController");
+
 app.use(express.json());
 
 app.use((req, res, next) => {

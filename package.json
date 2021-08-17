@@ -10,6 +10,8 @@
   "author": "dm",
   "license": "ISC",
   "dependencies": {
+    "agenda": "^4.2.1",
+    "axios": "^0.21.1",
     "bcrypt": "^5.0.1",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
