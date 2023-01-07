@@ -6,11 +6,15 @@ const app = express();
 
 const jwt = require("jsonwebtoken");
 
+var cors = require("cors");
+
 const routes = require("./routes");
 
 // const agenda = require("./controllers/weatherController");
 
 app.use(express.json());
+
+app.use(cors());
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
