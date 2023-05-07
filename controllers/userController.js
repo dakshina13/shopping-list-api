@@ -44,7 +44,7 @@ const loginUser = async (req, res) => {
     if (registered) {
       if (await bcrypt.compare(valid.password, registered.password)) {
         const user = createUser(registered);
-        return res.json(generateToken(user));
+        return res.sendStatus(200).json(generateToken(user));
       } else {
         return res
           .sendStatus(403)
